@@ -16,6 +16,11 @@ func Watch(ctx context.Context, notify chan<- bool) {
 				notify <- true
 				break stop
 			case <-ticker.C:
+				if ctx.Err() != nil {
+					Info("terminating: context cancelled")
+					notify <- true
+					break stop
+				}
 			}
 		}
 		ticker.Stop()
