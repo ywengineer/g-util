@@ -10,6 +10,7 @@ import (
 )
 
 type MySQL struct {
+	dsn  string
 	conn *sqlx.DB
 	log  *zap.Logger
 }
@@ -44,7 +45,7 @@ func NewMySQL(dbUser, dbPassword, dbHost, dbName, locale string,
 		db.SetMaxIdleConns(maxIdleConn)
 		//
 		if err := db.Ping(); err == nil {
-			return &MySQL{conn: db, log: log}
+			return &MySQL{conn: db, log: log, dsn: dsn}
 		} else {
 			log.Fatal("ping mysql failed", zap.Error(err))
 			return nil
@@ -52,7 +53,29 @@ func NewMySQL(dbUser, dbPassword, dbHost, dbName, locale string,
 	}
 }
 
+func (mysql *MySQL) String() string {
+	return mysql.dsn
+}
+
+func (mysql *MySQL) Info() map[string]interface{} {
+	s := mysql.conn.Stats()
+	return map[string]interface{}{
+		"MaxOpenConnections(Maximum number of open connections to the database)": s.MaxOpenConnections,
+		//
+		"OpenConnections(The number of established connections both in use and idle)": s.OpenConnections,
+		"Idle(The number of idle connections)":                                        s.Idle,
+		"InUse(The number of connections currently in use)":                           s.InUse,
+		//
+		"WaitCount(The total number of connections waited for)":             s.WaitCount,
+		"WaitDuration(The total time blocked waiting for a new connection)": s.WaitDuration.Seconds(),
+		//
+		"MaxIdleClosed(The total number of connections closed due to SetMaxIdleConns)":        s.MaxIdleClosed,
+		"MaxLifetimeClosed(The total number of connections closed due to SetConnMaxLifetime)": s.MaxLifetimeClosed,
+	}
+}
+
 func (mysql *MySQL) GetConn() *sqlx.DB {
+	mysql.conn.Stats()
 	return mysql.conn
 }
 
