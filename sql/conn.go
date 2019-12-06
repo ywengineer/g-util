@@ -17,7 +17,7 @@ type MySQL struct {
 func NewMySQL(dbUser, dbPassword, dbHost, dbName, locale string,
 	dbPort, dbWriteTimeout, dbReadTimeout, dbDialTimeout int,
 	maxOpenConn, maxIdleConn int,
-	log *zap.Logger) (*MySQL, error) {
+	log *zap.Logger) *MySQL {
 	// "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4,utf8&time_zone=%s&loc=%s&autocommit=true&writeTimeout=%ds&readTimeout=%ds&timeout=%ds"
 	if len(locale) == 0 {
 		locale = "Asia/Shanghai"
@@ -37,17 +37,17 @@ func NewMySQL(dbUser, dbPassword, dbHost, dbName, locale string,
 		dbDialTimeout)
 	if db, err := sqlx.Connect("mysql", dsn); err != nil {
 		log.Fatal("connect mysql failed", zap.Error(err))
-		return nil, err
+		return nil
 	} else {
 		//
 		db.SetMaxOpenConns(maxOpenConn)
 		db.SetMaxIdleConns(maxIdleConn)
 		//
 		if err := db.Ping(); err == nil {
-			return &MySQL{conn: db, log: log}, nil
+			return &MySQL{conn: db, log: log}
 		} else {
 			log.Fatal("ping mysql failed", zap.Error(err))
-			return nil, err
+			return nil
 		}
 	}
 }
