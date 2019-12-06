@@ -40,3 +40,7 @@ func Warn(format string, args ...interface{}) {
 func Error(format string, args ...interface{}) {
 	consoleTag(zapcore.ErrorLevel, "ERROR", format, args...)
 }
+
+func Panic(format string, args ...interface{}) {
+	_Log.Panicf("[%s] %s\n", "FALTA", fmt.Sprintf(format, args...))
+}
