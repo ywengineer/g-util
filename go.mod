@@ -7,5 +7,6 @@ require (
 	github.com/jmoiron/sqlx v1.2.0 // indirect
 	go.uber.org/zap v1.13.0
 	google.golang.org/appengine v1.6.5 // indirect
-	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
