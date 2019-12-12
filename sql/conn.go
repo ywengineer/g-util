@@ -26,7 +26,7 @@ func NewMySQL(dbUser, dbPassword, dbHost, dbName, locale string,
 	if _, e := time.LoadLocation(locale); e != nil {
 		log.Panic("unknown locale", zap.String("loc", locale))
 	}
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4,utf8&loc=%s&autocommit=true&writeTimeout=%ds&readTimeout=%ds&timeout=%ds",
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4,utf8&loc=%s&autocommit=true&writeTimeout=%ds&readTimeout=%ds&timeout=%ds&interpolateParams=true",
 		dbUser,
 		dbPassword,
 		dbHost,
