@@ -7,13 +7,13 @@ import (
 	"os"
 )
 
-func NewLogger(logFile string, maxFileSize, maxBackups, maxAge int, level zapcore.Level, dev bool) *zap.Logger {
+func NewLogger(logFile string, maxFileMB, maxBackups, maxDays int, level zapcore.Level, dev bool) *zap.Logger {
 	hook := lumberjack.Logger{
-		Filename:   logFile,     // 日志文件路径
-		MaxSize:    maxFileSize, // 每个日志文件保存的最大尺寸 单位：M
-		MaxBackups: maxBackups,  // 日志文件最多保存多少个备份
-		MaxAge:     maxAge,      // 文件最多保存多少天
-		Compress:   true,        // 是否压缩
+		Filename:   logFile,    // 日志文件路径
+		MaxSize:    maxFileMB,  // 每个日志文件保存的最大尺寸 单位：M
+		MaxBackups: maxBackups, // 日志文件最多保存多少个备份
+		MaxAge:     maxDays,    // 文件最多保存多少天
+		Compress:   true,       // 是否压缩
 	}
 
 	encoderConfig := zapcore.EncoderConfig{
