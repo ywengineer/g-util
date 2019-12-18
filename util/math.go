@@ -36,3 +36,7 @@ func MinInt(a, b int) int {
 	}
 	return b
 }
+
+func StringWithNoSpace(str string) bool {
+	return len(strings.TrimSpace(str)) > 0
+}

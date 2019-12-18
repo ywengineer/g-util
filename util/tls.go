@@ -7,7 +7,7 @@ import (
 )
 
 func CreateTlsConfiguration(certFile, keyFile, caFile *string, verifySsl bool) (t *tls.Config) {
-	if *certFile != "" && *keyFile != "" && *caFile != "" {
+	if StringWithNoSpace(*certFile) && StringWithNoSpace(*keyFile) && StringWithNoSpace(*caFile) {
 		cert, err := tls.LoadX509KeyPair(*certFile, *keyFile)
 		if err != nil {
 			Panic("failed to LoadX509KeyPair(cert, key). %v", err)
