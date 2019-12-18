@@ -3,6 +3,7 @@ module github.com/ywengineer/g-util
 go 1.13
 
 require (
+	github.com/Shopify/sarama v1.24.1 // indirect
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/jmoiron/sqlx v1.2.0 // indirect
 	go.uber.org/zap v1.13.0
