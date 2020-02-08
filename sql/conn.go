@@ -75,7 +75,6 @@ func (mysql *MySQL) Info() map[string]interface{} {
 }
 
 func (mysql *MySQL) GetConn() *sqlx.DB {
-	mysql.conn.Stats()
 	return mysql.conn
 }
 
