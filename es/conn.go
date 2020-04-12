@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func NewESClient(address []string, log *zap.Logger) *elasticsearch.Client {
+func NewESClient(address []string, log *zap.Logger) *esapi.API {
 	cfg := elasticsearch.Config{
 		Addresses: address,
 		Transport: &transport{},
@@ -35,7 +35,8 @@ func NewESClient(address []string, log *zap.Logger) *elasticsearch.Client {
 			log.Fatal("Error creating es client through info method", zap.Error(e))
 		} else {
 			log.Info("es client created.", zap.Any("info", infoJson))
+			return esapi.New(es)
 		}
 	}
-	return es
+	return nil
 }

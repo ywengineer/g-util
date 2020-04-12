@@ -2,7 +2,6 @@ package es
 
 import (
 	"context"
-	"github.com/elastic/go-elasticsearch/v7/esapi"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/ywengineer/g-util/util"
 	"go.uber.org/zap/zapcore"
@@ -12,24 +11,9 @@ import (
 func TestNewESClient(t *testing.T) {
 	l := util.NewLogger("../logs/log.log", 32, 64, 7, zapcore.DebugLevel, true)
 	es := NewESClient([]string{"http://8.129.217.210:9200"}, l)
-	req := esapi.IndicesGetSettingsRequest{
-		Index:             []string{"log_order"},
-		Name:              nil,
-		AllowNoIndices:    nil,
-		ExpandWildcards:   "",
-		FlatSettings:      nil,
-		IgnoreUnavailable: nil,
-		IncludeDefaults:   nil,
-		Local:             nil,
-		MasterTimeout:     0,
-		Pretty:            false,
-		Human:             true,
-		ErrorTrace:        false,
-		FilterPath:        nil,
-		Header:            nil,
-	}
-	// Perform the request with the client.
-	res, err := req.Do(context.Background(), es)
+	gs := es.Indices.GetSettings
+	res, err := gs(gs.WithIndex("log_order"), gs.WithHuman(), gs.WithContext(context.Background()))
+	//
 	if err != nil {
 		t.Fatalf("Error getting response: %v", err)
 	}
