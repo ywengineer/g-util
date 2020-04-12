@@ -8,6 +8,16 @@ import (
 	"testing"
 )
 
+func TestJSON(t *testing.T) {
+	jsonApi := jsoniter.Config{UseNumber: true, EscapeHTML: true}.Froze()
+	m := map[string]interface{}{
+		"a": 1,
+		"b": "123",
+	}
+	text, _ := jsonApi.MarshalToString(m)
+	t.Log(text + "\n")
+}
+
 func TestNewESClient(t *testing.T) {
 	l := util.NewLogger("../logs/log.log", 32, 64, 7, zapcore.DebugLevel, true)
 	es := NewESClient([]string{"http://8.129.217.210:9200"}, l)
