@@ -1,10 +1,10 @@
 package es
 
 import (
-	"github.com/elastic/go-elasticsearch/v8"
-	"github.com/elastic/go-elasticsearch/v8/esapi"
+	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/elastic/go-elasticsearch/v7/esapi"
+	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
-	"io/ioutil"
 )
 
 func NewESClient(address []string, log *zap.Logger) *elasticsearch.Client {
@@ -23,17 +23,18 @@ func NewESClient(address []string, log *zap.Logger) *elasticsearch.Client {
 	}
 	es, err := elasticsearch.NewClient(cfg)
 	if err != nil {
-		log.Fatal("Error creating the client", zap.Error(err))
+		log.Fatal("Error creating es client", zap.Error(err))
 	} else {
+		infoJson := make(map[string]interface{})
 		if info, e := es.Info(func(request *esapi.InfoRequest) {
 			request.Human = true
 			request.Pretty = true
 		}); e != nil {
-			log.Fatal("Error creating the client through info method", zap.Error(e))
-		} else if t, e := ioutil.ReadAll(info.Body); e != nil {
-			log.Fatal("Error creating the client through info method", zap.Error(e))
+			log.Fatal("Error creating es client through info method", zap.Error(e))
+		} else if e := jsoniter.NewDecoder(info.Body).Decode(&infoJson); e != nil {
+			log.Fatal("Error creating es client through info method", zap.Error(e))
 		} else {
-			log.Info("elastic client created.", zap.Any("info", string(t)))
+			log.Info("es client created.", zap.Any("info", infoJson))
 		}
 	}
 	return es

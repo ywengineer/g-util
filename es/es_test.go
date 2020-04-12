@@ -2,7 +2,7 @@ package es
 
 import (
 	"context"
-	"github.com/elastic/go-elasticsearch/v8/esapi"
+	"github.com/elastic/go-elasticsearch/v7/esapi"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/ywengineer/g-util/util"
 	"go.uber.org/zap/zapcore"
@@ -10,7 +10,7 @@ import (
 )
 
 func TestNewESClient(t *testing.T) {
-	l := util.NewLogger("./logs/log.log", 32, 64, 7, zapcore.DebugLevel, true)
+	l := util.NewLogger("../logs/log.log", 32, 64, 7, zapcore.DebugLevel, true)
 	es := NewESClient([]string{"http://8.129.217.210:9200"}, l)
 	req := esapi.IndicesGetSettingsRequest{
 		Index:             []string{"log_order"},
