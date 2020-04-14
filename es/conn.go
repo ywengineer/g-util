@@ -10,7 +10,7 @@ import (
 func NewESClient(address []string, log *zap.Logger) *esapi.API {
 	cfg := elasticsearch.Config{
 		Addresses: address,
-		Transport: &transport{},
+		Transport: &FastHttpTransport{},
 		//Transport: &http.Transport{
 		//	MaxIdleConnsPerHost:   10,
 		//	ResponseHeaderTimeout: time.Millisecond,
