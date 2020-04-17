@@ -3,7 +3,7 @@ module github.com/ywengineer/g-util
 go 1.13
 
 require (
-	github.com/Shopify/sarama v1.24.1
+	github.com/Shopify/sarama v1.26.1
 	github.com/elastic/go-elasticsearch/v7 v7.5.1-0.20200409075911-14061b088525
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/jmoiron/sqlx v1.2.0
