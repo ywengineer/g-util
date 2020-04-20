@@ -1,7 +1,9 @@
 package g_util
 
 import (
+	"fmt"
 	jsoniter "github.com/json-iterator/go"
+	"github.com/valyala/fasthttp"
 	"net/url"
 	"testing"
 )
@@ -11,9 +13,15 @@ func TestUrl(t *testing.T) {
 	if e != nil {
 		t.Errorf("%v", e)
 	}
-	_, e = url.ParseRequestURI("http://www.nbaidu.com/abdkd/ia")
+	u, e := url.Parse("http://user:password@www.baidu.com")
 	if e != nil {
 		t.Errorf("%v", e)
+	} else {
+		t.Logf("%s, %s, %s", u.Scheme, u.Host, u.RequestURI())
+		t.Logf("%s://%s%s", u.Scheme, u.Host, u.RequestURI())
+		c := fasthttp.Client{}
+		statusCode, body, err := c.Get(nil, fmt.Sprintf("%s://%s%s", u.Scheme, u.Host, u.RequestURI()))
+		t.Logf("%d, %s, %v", statusCode, string(body), err)
 	}
 }
 
