@@ -50,7 +50,7 @@ func TestIndicesAnalyzer(t *testing.T) {
 	}
 }
 
-func TestNewESClient(t *testing.T) {
+func TestGetSettings(t *testing.T) {
 	gs := es.Indices.GetSettings
 	res, err := gs(gs.WithIndex("log_order"), gs.WithHuman(), gs.WithContext(context.Background()))
 	//
@@ -61,6 +61,31 @@ func TestNewESClient(t *testing.T) {
 
 	if res.IsError() {
 		t.Logf("[%s] Error get index setting", res.Status())
+	} else {
+		// Deserialize the response into a map.
+		var r map[string]interface{}
+		if err := jsoniter.NewDecoder(res.Body).Decode(&r); err != nil {
+			t.Logf("Error parsing the response body: %v", err)
+		} else if tx, err := jsoniter.MarshalToString(r); err != nil {
+			// Print the response status and indexed document version.
+			t.Logf("[%s] %v", res.Status(), err)
+		} else {
+			t.Logf("[%s] %s", res.Status(), tx)
+		}
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	gs := es.Update
+	res, err := gs("log_player_quest", "77965241413144576", strings.NewReader(`{"doc":{"reply":"这是回复内容","replyer":"回复人","note":"这是备注","replyTime":"2020-04-20 12:00:00"}}`), gs.WithContext(context.Background()))
+	//
+	if err != nil {
+		t.Fatalf("Error getting response: %v", err)
+	}
+	defer res.Body.Close()
+
+	if res.IsError() {
+		t.Logf("[%s] Error update doc", res.Status())
 	} else {
 		// Deserialize the response into a map.
 		var r map[string]interface{}

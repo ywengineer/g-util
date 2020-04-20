@@ -37,4 +37,6 @@ func TestJ(t *testing.T) {
 	} else {
 		t.Logf("%v", sl)
 	}
+	body, _ = jsoniter.MarshalToString(map[string]interface{}{"kdaf": 123, "iefa": "kida", "createTime": "2020-04-20 12:10:11"})
+	t.Log(`{"doc": ` + body + `}`)
 }
