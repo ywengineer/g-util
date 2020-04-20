@@ -1,29 +1,23 @@
 package util
 
 import (
+	"encoding/json"
 	"errors"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
-//Bool
-//Int
-//Int8
-//Int16
-//Int32
-//Int64
-//Uint
-//Uint8
-//Uint16
-//Uint32
-//Uint64
-//Uintptr
 func Int2String(n interface{}) (string, error) {
 	if n == nil {
 		return "", errors.New("nil value detected")
 	}
-	t := reflect.TypeOf(n).Kind()
-	switch t {
+	t := reflect.TypeOf(n)
+	//
+	if strings.EqualFold(t.String(), "json.Number") {
+		return n.(json.Number).String(), nil
+	}
+	switch t.Kind() {
 	case reflect.Bool:
 		if n.(bool) {
 			return "1", nil
@@ -51,6 +45,8 @@ func Int2String(n interface{}) (string, error) {
 	case reflect.Uint64:
 		return strconv.FormatUint(n.(uint64), 10), nil
 	case reflect.Uintptr:
+		fallthrough
+	case reflect.Ptr:
 		return Int2String(reflect.ValueOf(n).Elem().Interface())
 	default:
 		return "", errors.New("detect an non-numeric type : " + t.String())
