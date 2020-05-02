@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func NewHttpTracer(conf HttpTracerConf, logger *zap.Logger) *zipkin.Tracer {
+func NewHttpTracer(conf HttpTracerConf, rate float64, logger *zap.Logger) *zipkin.Tracer {
 	// create a reporter to be used by the tracer
 	if len(conf.ReporterAddress) == 0 {
 		conf.ReporterAddress = "http://localhost:9411/api/v2/spans"
@@ -24,7 +24,7 @@ func NewHttpTracer(conf HttpTracerConf, logger *zap.Logger) *zipkin.Tracer {
 		logger.Fatal("unable to create local endpoint", zap.Error(err))
 	}
 	// set-up our sampling strategy
-	sampler, err := zipkin.NewBoundarySampler(0.01, time.Now().UnixNano())
+	sampler, err := zipkin.NewBoundarySampler(rate, time.Now().UnixNano())
 	if err != nil {
 		logger.Fatal("unable to create sampler", zap.Error(err))
 	}
