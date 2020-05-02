@@ -4,22 +4,20 @@ import (
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esapi"
 	jsoniter "github.com/json-iterator/go"
+	zipkinhttp "github.com/openzipkin/zipkin-go/middleware/http"
+	"github.com/ywengineer/g-util/httpclient"
 	"go.uber.org/zap"
+	"net/http"
 )
 
-func NewESClient(address []string, log *zap.Logger) *esapi.API {
+var defaultTransport = httpclient.NewFastHttpTransport()
+
+func NewESClientWithZipkin(address []string, client *zipkinhttp.Client, log *zap.Logger) *esapi.API {
 	cfg := elasticsearch.Config{
 		Addresses: address,
-		Transport: &FastHttpTransport{},
-		//Transport: &http.Transport{
-		//	MaxIdleConnsPerHost:   10,
-		//	ResponseHeaderTimeout: time.Millisecond,
-		//	DialContext:           (&net.Dialer{Timeout: time.Nanosecond}).DialContext,
-		//	TLSClientConfig: &tls.Config{
-		//		MinVersion: tls.VersionTLS11,
-		//		// ...
-		//	},
-		//},
+		Transport: &innerTransport{
+			client: client,
+		},
 	}
 	es, err := elasticsearch.NewClient(cfg)
 	if err != nil {
@@ -39,4 +37,24 @@ func NewESClient(address []string, log *zap.Logger) *esapi.API {
 		}
 	}
 	return nil
+}
+
+func NewESClient(address []string, log *zap.Logger) *esapi.API {
+	return NewESClientWithZipkin(address, nil, log)
+}
+
+// Transport implements the estransport interface with
+// the github.com/valyala/fasthttp HTTP client.
+//
+type innerTransport struct {
+	client *zipkinhttp.Client
+}
+
+// RoundTrip performs the request and returns a response or error
+//
+func (t *innerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if t.client == nil {
+		return defaultTransport.RoundTrip(req)
+	}
+	return t.client.DoWithAppSpan(req, "elastic")
 }

@@ -1,4 +1,4 @@
-package es
+package httpclient
 
 import (
 	"github.com/valyala/fasthttp"
@@ -10,11 +10,16 @@ import (
 // Transport implements the estransport interface with
 // the github.com/valyala/fasthttp HTTP client.
 //
-type FastHttpTransport struct{}
+type fastHttpTransport struct {
+}
+
+func NewFastHttpTransport() *fastHttpTransport {
+	return &fastHttpTransport{}
+}
 
 // RoundTrip performs the request and returns a response or error
 //
-func (t *FastHttpTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+func (t *fastHttpTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	freq := fasthttp.AcquireRequest()
 	defer fasthttp.ReleaseRequest(freq)
 
@@ -36,7 +41,7 @@ func (t *FastHttpTransport) RoundTrip(req *http.Request) (*http.Response, error)
 
 // copyRequest converts a http.Request to fasthttp.Request
 //
-func (t *FastHttpTransport) copyRequest(dst *fasthttp.Request, src *http.Request) *fasthttp.Request {
+func (t *fastHttpTransport) copyRequest(dst *fasthttp.Request, src *http.Request) *fasthttp.Request {
 	if src.Method == "GET" && src.Body != nil {
 		src.Method = "POST"
 	}
@@ -62,7 +67,7 @@ func (t *FastHttpTransport) copyRequest(dst *fasthttp.Request, src *http.Request
 
 // copyResponse converts a http.Response to fasthttp.Response
 //
-func (t *FastHttpTransport) copyResponse(dst *http.Response, src *fasthttp.Response) *http.Response {
+func (t *fastHttpTransport) copyResponse(dst *http.Response, src *fasthttp.Response) *http.Response {
 	dst.StatusCode = src.StatusCode()
 
 	src.Header.VisitAll(func(k, v []byte) {

@@ -8,6 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/json-iterator/go v1.1.9
+	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/valyala/fasthttp v1.9.0
 	go.uber.org/zap v1.13.0
 	google.golang.org/appengine v1.6.5 // indirect
