@@ -5,7 +5,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 )
+
+var fastClient = fasthttp.Client{
+	Name:         "CustomFasthttpClient",
+	ReadTimeout:  2 * time.Second,
+	WriteTimeout: 1 * time.Second,
+}
 
 // Transport implements the estransport interface with
 // the github.com/valyala/fasthttp HTTP client.
@@ -28,7 +35,7 @@ func (t *fastHttpTransport) RoundTrip(req *http.Request) (*http.Response, error)
 
 	t.copyRequest(freq, req)
 
-	err := fasthttp.Do(freq, fres)
+	err := fastClient.Do(freq, fres)
 	if err != nil {
 		return nil, err
 	}

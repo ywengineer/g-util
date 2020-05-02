@@ -5,7 +5,7 @@ import (
 	"github.com/openzipkin/zipkin-go/model"
 )
 
-type TracerConf struct {
+type HttpTracerConf struct {
 	ReporterAddress string `json:"reporter_address"`
 	ServiceName     string `json:"service_name"`
 	ServiceHostPort string `json:"service_host_port"`

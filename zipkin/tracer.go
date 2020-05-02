@@ -7,10 +7,9 @@ import (
 	"time"
 )
 
-func NewTracer(conf TracerConf, logger *zap.Logger) *zipkin.Tracer {
+func NewHttpTracer(conf HttpTracerConf, logger *zap.Logger) *zipkin.Tracer {
 	// create a reporter to be used by the tracer
 	if len(conf.ReporterAddress) == 0 {
-		logger.Warn("reporter address not assign, will use local: http://localhost:9411/api/v2/spans")
 		conf.ReporterAddress = "http://localhost:9411/api/v2/spans"
 	}
 	zipkinReporter := httpreporter.NewReporter(conf.ReporterAddress,

@@ -1,14 +1,14 @@
 package httpclient
 
 import (
-	"github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/middleware/http"
+	zipkin2 "github.com/ywengineer/g-util/zipkin"
 	"go.uber.org/zap"
 )
 
-func NewZipkinClient(tracer *zipkin.Tracer, log *zap.Logger) *zipkinhttp.Client {
+func NewZipkinHttpClient(conf zipkin2.HttpTracerConf, log *zap.Logger) *zipkinhttp.Client {
 	// create global zipkin traced http client
-	client, err := zipkinhttp.NewClient(tracer,
+	client, err := zipkinhttp.NewClient(zipkin2.NewHttpTracer(conf, log),
 		zipkinhttp.ClientTrace(true),
 		zipkinhttp.ClientTags(map[string]string{
 			"clientType": "golang",
