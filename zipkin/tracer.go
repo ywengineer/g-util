@@ -27,7 +27,7 @@ func NewHttpTracer(conf HttpTracerConf, logger *zap.Logger) *zipkin.Tracer {
 		logger.Fatal("unable to create local endpoint", zap.Error(err))
 	}
 	// set-up our sampling strategy
-	sampler, err := zipkin.NewBoundarySampler(rate, time.Now().UnixNano())
+	sampler, err := zipkin.NewBoundarySampler(conf.Rate, time.Now().UnixNano())
 	if err != nil {
 		logger.Fatal("unable to create sampler", zap.Error(err))
 	}
