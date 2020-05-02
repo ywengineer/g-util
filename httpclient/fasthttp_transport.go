@@ -42,6 +42,7 @@ func (t *fastHttpTransport) RoundTrip(req *http.Request) (*http.Response, error)
 
 	res := &http.Response{Header: make(http.Header)}
 	t.copyResponse(res, fres)
+	res.Request = req
 
 	return res, nil
 }
@@ -76,11 +77,12 @@ func (t *fastHttpTransport) copyRequest(dst *fasthttp.Request, src *http.Request
 //
 func (t *fastHttpTransport) copyResponse(dst *http.Response, src *fasthttp.Response) *http.Response {
 	dst.StatusCode = src.StatusCode()
+	dst.ContentLength = int64(src.Header.ContentLength())
+	dst.Close = src.ConnectionClose()
 
 	src.Header.VisitAll(func(k, v []byte) {
 		dst.Header.Set(string(k), string(v))
 	})
-
 	// Cast to a string to make a copy seeing as src.Body() won't
 	// be valid after the response is released back to the pool (fasthttp.ReleaseResponse).
 	dst.Body = ioutil.NopCloser(strings.NewReader(string(src.Body())))
