@@ -7,10 +7,13 @@ import (
 	"time"
 )
 
-func NewHttpTracer(conf HttpTracerConf, rate float64, logger *zap.Logger) *zipkin.Tracer {
+func NewHttpTracer(conf HttpTracerConf, logger *zap.Logger) *zipkin.Tracer {
 	// create a reporter to be used by the tracer
 	if len(conf.ReporterAddress) == 0 {
 		conf.ReporterAddress = "http://localhost:9411/api/v2/spans"
+	}
+	if conf.Rate <= 0 || conf.Rate > 1 {
+		conf.Rate = 1
 	}
 	zipkinReporter := httpreporter.NewReporter(conf.ReporterAddress,
 		httpreporter.Serializer(JSONSerializer{}))
