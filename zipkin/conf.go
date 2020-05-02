@@ -6,9 +6,10 @@ import (
 )
 
 type HttpTracerConf struct {
-	ReporterAddress string `json:"reporter_address"`
-	ServiceName     string `json:"service_name"`
-	ServiceHostPort string `json:"service_host_port"`
+	ReporterAddress string  `json:"reporter_address"`
+	ServiceName     string  `json:"service_name"`
+	ServiceHostPort string  `json:"service_host_port"`
+	Rate            float64 `json:"rate"`
 }
 
 // JSONSerializer implements the default JSON encoding SpanSerializer.

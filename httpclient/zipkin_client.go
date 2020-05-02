@@ -8,7 +8,7 @@ import (
 
 func NewZipkinHttpClient(conf zipkin2.HttpTracerConf, log *zap.Logger) *zipkinhttp.Client {
 	// create global zipkin traced http client
-	client, err := zipkinhttp.NewClient(zipkin2.NewHttpTracer(conf, log),
+	client, err := zipkinhttp.NewClient(zipkin2.NewHttpTracer(conf, conf.Rate, log),
 		zipkinhttp.ClientTrace(true),
 		zipkinhttp.ClientTags(map[string]string{
 			"clientType": "golang",
