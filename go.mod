@@ -5,10 +5,13 @@ go 1.13
 require (
 	github.com/Shopify/sarama v1.26.1
 	github.com/elastic/go-elasticsearch/v7 v7.5.1-0.20200409075911-14061b088525
+	github.com/gin-gonic/gin v1.6.2
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/json-iterator/go v1.1.9
 	github.com/openzipkin/zipkin-go v0.2.2
+	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/prometheus/client_golang v1.6.0
 	github.com/valyala/fasthttp v1.9.0
 	go.uber.org/zap v1.13.0
 	google.golang.org/appengine v1.6.5 // indirect
