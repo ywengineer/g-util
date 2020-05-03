@@ -37,6 +37,10 @@ func NewGinServer(port int, logger *zap.Logger, opts ...Option) *server {
 	return s
 }
 
+func (s *server) Router() *gin.Engine {
+	return s.router
+}
+
 func (s *server) Run() error {
 	//
 	s.router.NoRoute(func(c *gin.Context) {
