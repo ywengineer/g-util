@@ -5,12 +5,12 @@ import (
 	"github.com/elastic/go-elasticsearch/v7/esapi"
 	jsoniter "github.com/json-iterator/go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/middleware/http"
-	"github.com/ywengineer/g-util/httpclient"
+	"github.com/ywengineer/g-util/client"
 	"go.uber.org/zap"
 	"net/http"
 )
 
-var defaultTransport = httpclient.NewFastHttpTransport()
+var defaultTransport = client.NewFastHttpTransport()
 
 func NewESClientWithZipkin(address []string, client *zipkinhttp.Client, log *zap.Logger) *esapi.API {
 	cfg := elasticsearch.Config{
