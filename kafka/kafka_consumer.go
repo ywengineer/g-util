@@ -17,7 +17,7 @@ type KafkaConsumerProperties struct {
 	Version string   `json:"version" yaml:"version"`
 }
 
-func NewKafkaConsumer(ctx context.Context, log *zap.Logger, conf KafkaConsumerProperties) *kConsumer {
+func NewKafkaConsumer(ctx context.Context, log *zap.Logger, conf KafkaConsumerProperties) *KConsumer {
 	if len(conf.Brokers) == 0 || len(conf.Topics) == 0 {
 		log.Panic("missing kafka brokers or topics, consumer will not be disabled.")
 		return nil
@@ -43,7 +43,7 @@ func NewKafkaConsumer(ctx context.Context, log *zap.Logger, conf KafkaConsumerPr
 	/**
 	 * Setup a new Sarama consumer group
 	 */
-	consumer := &kConsumer{
+	consumer := &KConsumer{
 		ready: make(chan bool),
 		log:   log,
 	}
@@ -81,7 +81,7 @@ func NewKafkaConsumer(ctx context.Context, log *zap.Logger, conf KafkaConsumerPr
 }
 
 // Consumer represents a Sarama consumer group consumer
-type kConsumer struct {
+type KConsumer struct {
 	ready chan bool
 	mc    chan *sarama.ConsumerMessage
 	log   *zap.Logger
@@ -89,7 +89,7 @@ type kConsumer struct {
 
 // Setup is run at the beginning of a new session, before ConsumeClaim
 // Do not invoke this method directly
-func (consumer *kConsumer) Setup(sarama.ConsumerGroupSession) error {
+func (consumer *KConsumer) Setup(sarama.ConsumerGroupSession) error {
 	// Mark the consumer as ready
 	close(consumer.ready)
 	return nil
@@ -97,13 +97,13 @@ func (consumer *kConsumer) Setup(sarama.ConsumerGroupSession) error {
 
 // Cleanup is run at the end of a session, once all ConsumeClaim goroutines have exited
 // Do not invoke this method directly
-func (consumer *kConsumer) Cleanup(sarama.ConsumerGroupSession) error {
+func (consumer *KConsumer) Cleanup(sarama.ConsumerGroupSession) error {
 	return nil
 }
 
 // ConsumeClaim must start a consumer loop of ConsumerGroupClaim's Messages().
 // Do not invoke this method directly
-func (consumer *kConsumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
+func (consumer *KConsumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	// NOTE:
 	// Do not move the code below to a goroutine.
 	// The `ConsumeClaim` itself is called within a goroutine, see:
@@ -117,12 +117,12 @@ func (consumer *kConsumer) ConsumeClaim(session sarama.ConsumerGroupSession, cla
 	return nil
 }
 
-func (consumer *kConsumer) Read() <-chan *sarama.ConsumerMessage {
+func (consumer *KConsumer) Read() <-chan *sarama.ConsumerMessage {
 	return consumer.mc
 }
 
 // Cleanup is run at the end of a session, once all ConsumeClaim goroutines have exited
-func (consumer *kConsumer) afterConsume(session sarama.ConsumerGroupSession, message *sarama.ConsumerMessage) {
+func (consumer *KConsumer) afterConsume(session sarama.ConsumerGroupSession, message *sarama.ConsumerMessage) {
 	session.MarkMessage(message, "")
 	consumer.log.Debug("consumed kafka message", zap.String("tag", "KafkaMessage"), zap.String("data", string(message.Value)))
 }
