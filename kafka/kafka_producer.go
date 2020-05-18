@@ -4,6 +4,7 @@ import (
 	"github.com/Shopify/sarama"
 	"github.com/ywengineer/g-util/util"
 	"go.uber.org/zap"
+	"log"
 	"time"
 )
 
@@ -14,6 +15,7 @@ type KafkaProducerProperties struct {
 	CaFile            string   `json:"ca_file" yaml:"ca-file"`
 	VerifySSL         bool     `json:"verify_ssl" yaml:"verify-ssl"`
 	Compression       string   `json:"compression" yaml:"compression"`
+	Version           string   `json:"version" yaml:"version"`
 	IgnoreSendSuccess bool     `json:"ignore_send_success" yaml:"ignore-send-success"`
 }
 
@@ -41,14 +43,14 @@ func checkCompression(compression string) sarama.CompressionCodec {
 }
 
 func NewKafkaSyncProducerFromConf(conf KafkaProducerProperties) sarama.SyncProducer {
-	return NewKafkaSyncProducer(conf.Brokers, &conf.CertFile, &conf.KeyFile, &conf.CaFile, conf.VerifySSL, checkCompression(conf.Compression))
+	return NewKafkaSyncProducer(conf.Brokers, &conf.Version, &conf.CertFile, &conf.KeyFile, &conf.CaFile, conf.VerifySSL, checkCompression(conf.Compression))
 }
 
 func NewKafkaAsyncProducerFromConf(conf KafkaProducerProperties, errLog *zap.Logger) sarama.AsyncProducer {
-	return NewKafkaAsyncProducer(conf.Brokers, &conf.CertFile, &conf.KeyFile, &conf.CaFile, conf.VerifySSL, conf.IgnoreSendSuccess, errLog, checkCompression(conf.Compression))
+	return NewKafkaAsyncProducer(conf.Brokers, &conf.Version, &conf.CertFile, &conf.KeyFile, &conf.CaFile, conf.VerifySSL, conf.IgnoreSendSuccess, errLog, checkCompression(conf.Compression))
 }
 
-func NewKafkaSyncProducer(brokerList []string, certFile, keyFile, caFile *string, verifySsl bool, compression sarama.CompressionCodec) sarama.SyncProducer {
+func NewKafkaSyncProducer(brokerList []string, version, certFile, keyFile, caFile *string, verifySsl bool, compression sarama.CompressionCodec) sarama.SyncProducer {
 	if len(brokerList) == 0 {
 		util.Panic("no brokers for kafka sync sender")
 	}
@@ -56,6 +58,12 @@ func NewKafkaSyncProducer(brokerList []string, certFile, keyFile, caFile *string
 	// Because we don't change the flush settings, sarama will try to produce messages
 	// as fast as possible to keep latency low.
 	config := sarama.NewConfig()
+	//
+	ver, err := sarama.ParseKafkaVersion(*version)
+	if err != nil {
+		log.Panic("Error parsing Kafka version", zap.Error(err))
+	}
+	config.Version = ver
 	//
 	config.Producer.Compression = compression
 	config.Producer.RequiredAcks = sarama.WaitForAll // Wait for all in-sync replicas to ack the message
@@ -83,7 +91,7 @@ func NewKafkaSyncProducer(brokerList []string, certFile, keyFile, caFile *string
 	return producer
 }
 
-func NewKafkaAsyncProducer(brokerList []string, certFile, keyFile, caFile *string,
+func NewKafkaAsyncProducer(brokerList []string, version, certFile, keyFile, caFile *string,
 	verifySsl, ignoreSendSuccess bool,
 	errorLogger *zap.Logger,
 	compression sarama.CompressionCodec) sarama.AsyncProducer {
@@ -93,6 +101,12 @@ func NewKafkaAsyncProducer(brokerList []string, certFile, keyFile, caFile *strin
 	// For the access log, we are looking for AP semantics, with high throughput.
 	// By creating batches of compressed messages, we reduce network I/O at a cost of more latency.
 	config := sarama.NewConfig()
+	//
+	ver, err := sarama.ParseKafkaVersion(*version)
+	if err != nil {
+		log.Panic("Error parsing Kafka version", zap.Error(err))
+	}
+	config.Version = ver
 	//
 	tlsConfig := util.CreateTlsConfiguration(certFile, keyFile, caFile, verifySsl)
 	if tlsConfig != nil {
