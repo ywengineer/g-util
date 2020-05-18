@@ -72,6 +72,8 @@ func NewKafkaSyncProducer(brokerList []string, version, certFile, keyFile, caFil
 	config.Producer.Return.Successes = true
 	config.Producer.Return.Errors = true
 	config.Producer.Idempotent = true
+	// when enable idempotent, must set blow to 1
+	config.Net.MaxOpenRequests = 1
 	//
 	tlsConfig := util.CreateTlsConfiguration(certFile, keyFile, caFile, verifySsl)
 	if tlsConfig != nil {
@@ -118,6 +120,9 @@ func NewKafkaAsyncProducer(brokerList []string, version, certFile, keyFile, caFi
 	config.Producer.RequiredAcks = sarama.WaitForLocal // Only wait for the leader to ack
 	config.Producer.Compression = compression          // Compress messages
 	config.Producer.Flush.Frequency = 1 * time.Second  // Flush batches every 1s
+
+	// when enable idempotent, must set blow to 1
+	config.Net.MaxOpenRequests = 1
 
 	producer, err := sarama.NewAsyncProducer(brokerList, config)
 
