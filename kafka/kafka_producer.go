@@ -2,6 +2,7 @@ package util
 
 import (
 	"github.com/Shopify/sarama"
+	"github.com/ywengineer/g-util/util"
 	"go.uber.org/zap"
 	"time"
 )
@@ -34,7 +35,7 @@ func checkCompression(compression string) sarama.CompressionCodec {
 	case "zstd":
 		return sarama.CompressionZSTD
 	default:
-		Panic("unsupported kafka's compression: %s. %s", compression, `"none","gzip","snappy","lz4","zstd"`)
+		util.Panic("unsupported kafka's compression: %s. %s", compression, `"none","gzip","snappy","lz4","zstd"`)
 	}
 	return sarama.CompressionNone
 }
@@ -49,7 +50,7 @@ func NewKafkaAsyncProducerFromConf(conf KafkaProducerProperties, errLog *zap.Log
 
 func NewKafkaSyncProducer(brokerList []string, certFile, keyFile, caFile *string, verifySsl bool, compression sarama.CompressionCodec) sarama.SyncProducer {
 	if len(brokerList) == 0 {
-		Panic("no brokers for kafka sync sender")
+		util.Panic("no brokers for kafka sync sender")
 	}
 	// For the data collector, we are looking for strong consistency semantics.
 	// Because we don't change the flush settings, sarama will try to produce messages
@@ -64,7 +65,7 @@ func NewKafkaSyncProducer(brokerList []string, certFile, keyFile, caFile *string
 	config.Producer.Return.Errors = true
 	config.Producer.Idempotent = true
 	//
-	tlsConfig := CreateTlsConfiguration(certFile, keyFile, caFile, verifySsl)
+	tlsConfig := util.CreateTlsConfiguration(certFile, keyFile, caFile, verifySsl)
 	if tlsConfig != nil {
 		config.Net.TLS.Config = tlsConfig
 		config.Net.TLS.Enable = true
@@ -76,7 +77,7 @@ func NewKafkaSyncProducer(brokerList []string, certFile, keyFile, caFile *string
 	producer, err := sarama.NewSyncProducer(brokerList, config)
 	//
 	if err != nil {
-		Panic("Failed to start Kafka producer: %v", err)
+		util.Panic("Failed to start Kafka producer: %v", err)
 	}
 	//
 	return producer
@@ -87,13 +88,13 @@ func NewKafkaAsyncProducer(brokerList []string, certFile, keyFile, caFile *strin
 	errorLogger *zap.Logger,
 	compression sarama.CompressionCodec) sarama.AsyncProducer {
 	if len(brokerList) == 0 {
-		Panic("no brokers for kafka async sender")
+		util.Panic("no brokers for kafka async sender")
 	}
 	// For the access log, we are looking for AP semantics, with high throughput.
 	// By creating batches of compressed messages, we reduce network I/O at a cost of more latency.
 	config := sarama.NewConfig()
 	//
-	tlsConfig := CreateTlsConfiguration(certFile, keyFile, caFile, verifySsl)
+	tlsConfig := util.CreateTlsConfiguration(certFile, keyFile, caFile, verifySsl)
 	if tlsConfig != nil {
 		config.Net.TLS.Enable = true
 		config.Net.TLS.Config = tlsConfig
@@ -107,7 +108,7 @@ func NewKafkaAsyncProducer(brokerList []string, certFile, keyFile, caFile *strin
 	producer, err := sarama.NewAsyncProducer(brokerList, config)
 
 	if err != nil {
-		Panic("Failed to start Kafka producer: %v", err)
+		util.Panic("Failed to start Kafka producer: %v", err)
 	}
 	// We will just log to STDOUT if we're not able to produce messages.
 	// Note: messages will only be returned here after all retry attempts are exhausted.
