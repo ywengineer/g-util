@@ -44,6 +44,7 @@ func NewKafkaConsumer(ctx context.Context, log *zap.Logger, conf KafkaConsumerPr
 	 * Setup a new Sarama consumer group
 	 */
 	consumer := &KConsumer{
+		stop:  make(chan bool),
 		ready: make(chan bool),
 		log:   log,
 	}
@@ -85,6 +86,7 @@ type KConsumer struct {
 	ready chan bool
 	mc    chan *sarama.ConsumerMessage
 	log   *zap.Logger
+	stop  chan bool
 }
 
 // Setup is run at the beginning of a new session, before ConsumeClaim
@@ -114,11 +116,16 @@ func (consumer *KConsumer) ConsumeClaim(session sarama.ConsumerGroupSession, cla
 		//
 		consumer.afterConsume(session, message)
 	}
+	consumer.stop <- true
 	return nil
 }
 
 func (consumer *KConsumer) Read() <-chan *sarama.ConsumerMessage {
 	return consumer.mc
+}
+
+func (consumer *KConsumer) WaitTerminated() {
+	<-consumer.stop
 }
 
 // Cleanup is run at the end of a session, once all ConsumeClaim goroutines have exited
