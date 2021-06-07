@@ -9,12 +9,13 @@ import (
 )
 
 type KafkaConsumerProperties struct {
-	Brokers []string `json:"brokers" yaml:"brokers"`
-	Topics  []string `json:"topics" yaml:"topics"`
-	Group   string   `json:"group" yaml:"group"`
-	Verbose bool     `json:"verbose" yaml:"verbose"`
-	Oldest  bool     `json:"oldest" yaml:"oldest"`
-	Version string   `json:"version" yaml:"version"`
+	Brokers  []string `json:"brokers" yaml:"brokers"`
+	Topics   []string `json:"topics" yaml:"topics"`
+	Group    string   `json:"group" yaml:"group"`
+	Assignor string   `json:"assignor" yaml:"assignor"`
+	Verbose  bool     `json:"verbose" yaml:"verbose"`
+	Oldest   bool     `json:"oldest" yaml:"oldest"`
+	Version  string   `json:"version" yaml:"version"`
 }
 
 func NewKafkaConsumer(ctx context.Context, log *zap.Logger, conf KafkaConsumerProperties) *KConsumer {
@@ -39,7 +40,16 @@ func NewKafkaConsumer(ctx context.Context, log *zap.Logger, conf KafkaConsumerPr
 	if conf.Oldest {
 		config.Consumer.Offsets.Initial = sarama.OffsetOldest
 	}
-
+	switch conf.Assignor {
+	case "sticky":
+		config.Consumer.Group.Rebalance.Strategy = sarama.BalanceStrategySticky
+	case "roundrobin":
+		config.Consumer.Group.Rebalance.Strategy = sarama.BalanceStrategyRoundRobin
+	case "range":
+		config.Consumer.Group.Rebalance.Strategy = sarama.BalanceStrategyRange
+	default:
+		log.Panic("Unrecognized consumer group partition assignor: " + conf.Assignor)
+	}
 	/**
 	 * Setup a new Sarama consumer group
 	 */
