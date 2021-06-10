@@ -1,7 +1,5 @@
 module github.com/ywengineer/g-util
 
-go 1.13
-
 require (
 	github.com/Shopify/sarama v1.29.0
 	github.com/elastic/go-elasticsearch/v7 v7.13.1

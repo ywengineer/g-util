@@ -88,6 +88,7 @@ func NewKafkaConsumer(ctx context.Context, log *zap.Logger, conf KafkaConsumerPr
 			consumer.ready = make(chan bool)
 		}
 	}()
+	<-consumer.ready
 	return consumer
 }
 
